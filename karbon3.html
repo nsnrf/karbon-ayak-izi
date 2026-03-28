@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Türkiye Karbon Ayak İzi Hesaplayıcısı 🌿</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #e8f5e9 0%, #a5d6a7 100%); min-height: 100vh; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-top: 10px solid #1b5e20; }
+        
+        h1 { text-align: center; color: #1b5e20; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+
+        .category { margin-bottom: 30px; padding: 20px; background-color: #f9f9f9; border-radius: 15px; border-left: 5px solid #a5d6a7; }
+        .category-title { font-size: 1.3em; color: #2e7d32; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px; }
+
+        .question { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #444; }
+        
+        select, input[type="number"] { width: 100%; padding: 12px; border: 2px solid #ccc; border-radius: 10px; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
+        select:focus, input[type="number"]:focus { outline: none; border-color: #4caf50; box-shadow: 0 0 10px rgba(76, 175, 80, 0.2); }
+
+        button.main-btn { display: block; width: 100%; padding: 18px; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-top: 30px; }
+        button.main-btn:hover { background: linear-gradient(135deg, #388e3c 0%, #1b5e20 100%); transform: translateY(-2px); }
+
+        /* SONUÇ PANELİ */
+        #result-panel { display: none; margin-top: 40px; padding: 30px; border-radius: 20px; text-align: center; }
+        .status-badge { display: inline-block; padding: 10px 20px; border-radius: 50px; color: white; font-weight: bold; font-size: 1.2em; margin-bottom: 20px; }
+        
+        .high-alert { background-color: #d32f2f; border: 4px solid #b71c1c; animation: pulse 1s infinite; }
+        .low-safe { background-color: #388e3c; border: 4px solid #1b5e20; }
+        
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(211, 47, 47, 0); } 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); } }
+
+        .total-score { font-size: 3em; font-weight: bold; color: #1b5e20; margin: 10px 0; }
+        .total-unit { font-size: 1.2em; color: #666; margin-bottom: 20px; }
+
+        .breakdown { text-align: left; margin-top: 25px; background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px; }
+        .breakdown-title { font-weight: bold; color: #333; margin-bottom: 10px; font-size: 1.1em; }
+        .breakdown-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 1em; }
+        .percentage { font-weight: bold; color: #2e7d32; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Türkiye Karbon Ayak İzi Hesaplayıcısı</h1>
+    <p class="subtitle">Soruları yanıtla, Dünya üzerindeki izini keşfet! 🌍</p>
+
+    <div class="category">
+        <div class="category-title">🍴 1. Beslenme ve Alışveriş</div>
+        <div class="question">
+            <label>1- Beslenme alışkanlıklarınızı en iyi hangisi tanımlar?</label>
+            <select id="q1">
+                <option value="high">A) Her gün et tüketiyorum.</option>
+                <option value="medium">B) Haftada birkaç kez et tüketiyorum.</option>
+                <option value="low">C) Öğünlerimde hiç et tüketmiyorum / Vejetaryenim.</option>
+            </select>
+        </div>
+        <div class="question">
+            <label>2- Satın aldığınız gıdaların ne kadarı yerli üretim (Türkiye)?</label>
+            <select id="q2">
+                <option value="low">A) Neredeyse tamamı yerli ve mevsimlik.</option>
+                <option value="medium">B) Bazılarına dikkat ederim, bazen ithal alırım.</option>
+                <option value="high">C) Nereden geldiğine hiç bakmıyorum.</option>
+            </select>
+        </div>
+        <div class="question">
+            <label>3- Ayda ortalama kaç kez kargo/sipariş hizmeti (Getir, Trendyol vb.) kullanıyorsunuz?</label>
+            <input type="number" id="q3" placeholder="Örn: 5" min="0">
+        </div>
+    </div>
+
+    <div class="category">
+        <div class="category-title">🚗 2. Ulaşım Alışkanlıkları</div>
+        <div class="question">
+            <label>4- Kişisel araçta veya toplu taşımada (iş/okul) haftada kaç saat geçiriyorsunuz?</label>
+            <select id="q4">
+                <option value="2">A) 2 saatten az</option>
+                <option value="5">B) 2 - 5 saat arası</option>
+                <option value="15">C) 5 - 15 saat arası</option>
+                <option value="25">D) 15 - 25 saat arası</option>
+                <option value="30">E) 25 saatten fazla (Trafik dahil)</option>
+            </select>
+        </div>
+        <div class="question">
+            <label>5- Günlük seyahatlerinizde en çok hangi yöntemi kullanıyorsunuz?</label>
+            <select id="q5">
+                <option value="none">A) Hiç araç kullanmıyorum (Yürüme/Bisiklet).</option>
+                <option value="public">B) Sadece toplu taşıma.</option>
+                <option value="both">C) Hem toplu taşıma hem özel araç/taksi.</option>
+                <option value="private">D) Sadece özel araç veya taksi.</option>
+            </select>
+        </div>
+        <div class="question">
+            <label>6- Kişisel aracınızın (veya ailenizin) yakıt türü nedir?</label>
+            <select id="q6">
+                <option value="diesel">A) Dizel (Motorin)</option>
+                <option value="gasoline">B) Benzin</option>
+                <option value="hybrid">C) Hibrit</option>
+                <option value="electric">D) Elektrikli</option>
+                <option value="none">E) Aracımız yok.</option>
+            </select>
+        </div>
+        <div class="question">
+            <label>7- Geçtiğimiz yıl toplam kaç adet iç hat uçuşu gerçekleştirdiniz?</label>
+            <input type="number" id="q7" placeholder="Örn: 2" min="0">
+        </div>
+    </div>
+
+    <div class="category">
+        <div class="category-title">💡 3. Ev ve Enerji</div>
+        <div class="question">
+            <label>8- Işıkları kapatıyor ve cihazları bekleme modunda bırakmıyor musunuz?</label>
+            <select id="q8">
+                <option value="yes">A) Evet, her zaman dikkat ederim.</option>
+                <option value="no">B) Hayır, genelde bekleme modunda kalırlar.</option>
+            </select>
+        </div>
+        <div class="question">
+            <label>9- Atıklarınızı (plastik, metal, cam, kağıt) geri dönüştürüyor musunuz?</label>
+            <select id="q9">
+                <option value="yes">A) Evet, düzenli olarak.</option>
+                <option value="no">B) Hayır, geri dönüştürmüyorum.</option>
+            </select>
+        </div>
+        <div class="question">
+            <label>10- Aylık ortalama elektrik tüketiminiz nedir? (kWh)</label>
+            <input type="number" id="q10" placeholder="Örn: 200" min="0">
+        </div>
+        <div class="question">
+            <label>11- Aylık ortalama doğal gaz tüketiminiz nedir? (m^3)</label>
+            <input type="number" id="q11" placeholder="Örn: 100" min="0">
+        </div>
+        <div class="question">
+            <label>12- Evinizde ısı yalıtımı var mı?</label>
+            <select id="q12">
+                <option value="yes">A) Var</option>
+                <option value="no">B) Yok</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="main-btn" onclick="hesapla()">Ayak İzimi Hesapla!</button>
+
+    <div id="result-panel">
+        <div id="status-badge" class="status-badge"></div>
+        <div class="total-unit">Senin Yıllık Karbon Ayak İzin:</div>
+        <div id="total-score" class="total-score"></div>
+        <div class="total-unit">Ton CO<sub>2</sub></div>
+        
+        <div id="feedback-text"></div>
+
+        <div class="breakdown">
+            <div class="breakdown-title">Bölüm Bölüm Etkin (Yüzde %):</div>
+            <div class="breakdown-item"><span>Beslenme ve Alışveriş:</span> <span id="percent-food" class="percentage">0%</span></div>
+            <div class="breakdown-item"><span>Ulaşım ve Seyahat:</span> <span id="percent-transport" class="percentage">0%</span></div>
+            <div class="breakdown-item"><span>Ev ve Enerji:</span> <span id="percent-home" class="percentage">0%</span></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function hesapla() {
+        // --- 1. VERİLERİ AL ---
+        const getVal = (id) => document.getElementById(id).value;
+        const getNum = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+        // --- 2. BİLİMSEL KATSAYILAR VE PUANLAMA MANTIĞI ---
+        let foodScore = 0;
+        let transportScore = 0;
+        let homeScore = 0;
+
+        // 🍴 Beslenme (Yıllık Ton CO2 tahmini)
+        if (getVal('q1') === 'high') foodScore += 2.5; 
+        else if (getVal('q1') === 'medium') foodScore += 1.5;
+        else foodScore += 0.7; // Vejetaryen
+
+        if (getVal('q2') === 'high') foodScore += 0.5; // İthal gıda
+        else if (getVal('q2') === 'medium') foodScore += 0.2;
+
+        foodScore += (getNum('q3') * 12 * 0.005); // Her kargo ~5kg CO2 (0.005 ton)
+
+        // 🚗 Ulaşım
+        let weeklyHours = parseInt(getVal('q4'));
+        let transportType = getVal('q5');
+        let fuelType = getVal('q6');
+        
+        let transportationBase = 0;
+        if (transportType === 'public') transportationBase = 0.05; // Saat başına ton/yıl
+        else if (transportType === 'both') transportationBase = 0.15;
+        else if (transportType === 'private') transportationBase = 0.25; // Sadece özel araç
+
+        let fuelMultiplier = 1;
+        if (fuelType === 'diesel') fuelMultiplier = 1.1;
+        else if (fuelType === 'gasoline') fuelMultiplier = 1.0;
+        else if (fuelType === 'hybrid') fuelMultiplier = 0.7;
+        else if (fuelType === 'electric') fuelMultiplier = 0.3; // Türkiye enerji karması ile
+        else if (fuelType === 'none') fuelMultiplier = 0;
+
+        transportScore += (weeklyHours * transportationBase * fuelMultiplier * 52) / 10; // Ölçekleme
+
+        transportScore += (getNum('q7') * 0.2); // Her iç hat uçuşu ~200kg (0.2 ton)
+
+        // 💡 Ev ve Enerji
+        homeScore += (getNum('q10') * 12 * 0.45) / 1000; // Elektrik: kWh * 0.45kg * 12 ay
+        homeScore += (getNum('q11') * 12 * 1.9) / 1000;  // Doğal Gaz: m3 * 1.9kg * 12 ay
+
+        if (getVal('q8') === 'no') homeScore *= 1.1; // Tasarruf yoksa %10 ekle
+        if (getVal('q9') === 'no') homeScore += 0.3; // Geri dönüşüm yoksa ton ekle
+        if (getVal('q12') === 'no') homeScore *= 1.2; // Yalıtım yoksa %20 ekle
+
+        // --- 3. TOPLAM VE YÜZDELER ---
+        let totalScore = foodScore + transportScore + homeScore;
+        
+        let foodPercent = Math.round((foodScore / totalScore) * 100) || 0;
+        let transportPercent = Math.round((transportScore / totalScore) * 100) || 0;
+        let homePercent = Math.round((homeScore / totalScore) * 100) || 0;
+
+        // --- 4. SONUÇLARI EKRANA YAZDİR ---
+        document.getElementById('result-panel').style.display = 'block';
+        document.getElementById('total-score').innerText = totalScore.toFixed(2);
+        
+        document.getElementById('percent-food').innerText = foodPercent + '%';
+        document.getElementById('percent-transport').innerText = transportPercent + '%';
+        document.getElementById('percent-home').innerText = homePercent + '%';
+
+        // --- 5. LİTERATÜR KARŞILAŞTIRMASI VE GÖRSEL UYARI ---
+        // Türkiye ortalaması kişi başı yıllık ~5 ton CO2'dir. 
+        // 7. Sınıf seviyesinde sürdürülebilir bir hedef 3-4 ton civarında olmalıdır.
+        // Sınır olarak 6 Ton CO2 üzerini "Yüksek" kabul ediyoruz.
+        
+        const threshold = 6.0; 
+        const statusBadge = document.getElementById('status-badge');
+        const feedbackText = document.getElementById('feedback-text');
+        const resultPanel = document.getElementById('result-panel');
+
+        if (totalScore > threshold) {
+            statusBadge.innerText = '⚠️ YÜKSEK UYARI';
+            statusBadge.className = 'status-badge high-alert';
+            resultPanel.style.backgroundColor = '#ffcdd2'; // Açık kırmızı arka plan
+            feedbackText.innerHTML = '<p style="color:#b71c1c;">Karbon ayak izin Türkiye ortalamasının ve literatürdeki güvenli sınırın üzerinde. <br> Özellikle <b>%' + transportPercent + '</b> etkin olan Ulaşım bölümüne dikkat etmelisin.</p>';
+        } else {
+            statusBadge.innerText = '✅ GÜVENLİ BÖLGE';
+            statusBadge.className = 'status-badge low-safe';
+            resultPanel.style.backgroundColor = '#c8e6c9'; // Açık yeşil arka plan
+            feedbackText.innerHTML = '<p style="color:#1b5e20;">Tebrikler! Karbon ayak izin Dünya için sürdürülebilir bir seviyede. <br> Bu harika yaşam tarzını devam ettir.</p>';
+        }
+
+        // Sayfayı otomatik olarak sonuçlara kaydır
+        resultPanel.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
